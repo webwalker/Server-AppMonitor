@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgTypesMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgTypes">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="MsgName" property="msgName" jdbcType="VARCHAR" />
+		<result column="MsgDesc" property="msgDesc" jdbcType="VARCHAR" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, MsgName, MsgDesc, CreateTime, UpdateTime
+	</sql>
+	<select id="selectAll" resultMap="BaseResultMap">
+		select * from msg_type
+	</select>
+	<delete id="deleteByIDs" parameterType="java.lang.String">
+		DELETE FROM msg_type where id in
+		<foreach item="tid" collection="array" open="(" separator=","
+			close=")">
+			#{tid,mode=IN,jdbcType=INTEGER}
+		</foreach>
+	</delete>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from msg_type
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		msg_type
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgTypes">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_type (MsgName, MsgDesc, CreateTime,
+		UpdateTime)
+		values
+		(#{msgName,jdbcType=VARCHAR}, #{msgDesc,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgTypes">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="msgName != null">
+				MsgName,
+			</if>
+			<if test="msgDesc != null">
+				MsgDesc,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="updateTime != null">
+				UpdateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="msgName != null">
+				#{msgName,jdbcType=VARCHAR},
+			</if>
+			<if test="msgDesc != null">
+				#{msgDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgTypes">
+		update msg_type
+		<set>
+			<if test="msgName != null">
+				MsgName = #{msgName,jdbcType=VARCHAR},
+			</if>
+			<if test="msgDesc != null">
+				MsgDesc = #{msgDesc,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgTypes">
+		update msg_type
+		set MsgName = #{msgName,jdbcType=VARCHAR},
+		MsgDesc =
+		#{msgDesc,jdbcType=VARCHAR},
+		CreateTime =
+		#{createTime,jdbcType=TIMESTAMP},
+		UpdateTime =
+		#{updateTime,jdbcType=TIMESTAMP}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+</mapper>

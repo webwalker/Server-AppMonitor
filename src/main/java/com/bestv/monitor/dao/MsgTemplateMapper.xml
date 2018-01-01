@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgTemplateMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgTemplate">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="TemplateCode" property="templateCode" jdbcType="VARCHAR" />
+		<result column="TemplateName" property="templateName" jdbcType="VARCHAR" />
+		<result column="ValidateType" property="validateType" jdbcType="INTEGER" />
+		<result column="IsValid" property="isValid" jdbcType="BIT" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, TemplateCode, TemplateName,IsValid, ValidateType,
+		CreateTime,
+		UpdateTime
+	</sql>
+	<select id="selectAll" resultMap="BaseResultMap">
+		select * from msg_template
+	</select>
+	<select id="selectValids" resultMap="BaseResultMap">
+		select
+		mt.TemplateCode,mt.TemplateName, mt.ValidateType,
+		mr.RuleName,
+		mr.RuleRegex, mr.Message
+		from msg_template mt left JOIN
+		msg_temp_rule
+		mtr on mt.ID = mtr.TempID
+		LEFT JOIN msg_rule
+		mr on mtr.RuleID
+		= mr.ID
+		where mt.isValid = 1 and mr.isValid = 1
+	</select>
+	<delete id="deleteByIDs" parameterType="java.lang.String">
+		DELETE FROM msg_template where id in
+		<foreach item="tid" collection="array" open="(" separator=","
+			close=")">
+			#{tid,mode=IN,jdbcType=INTEGER}
+		</foreach>
+	</delete>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from msg_template
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		msg_template
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgTemplate">
+		insert into msg_template
+		(TemplateCode, TemplateName, ValidateType,
+		IsValid, CreateTime,
+		UpdateTime
+		)
+		values (#{templateCode,jdbcType=VARCHAR},
+		#{templateName,jdbcType=VARCHAR},
+		#{validateType,jdbcType=INTEGER},
+		#{isValid,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgTemplate">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_template
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="templateCode != null">
+				TemplateCode,
+			</if>
+			<if test="templateName != null">
+				TemplateName,
+			</if>
+			<if test="validateType != null">
+				ValidateType,
+			</if>
+			<if test="isValid != null">
+				IsValid,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="updateTime != null">
+				UpdateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="templateCode != null">
+				#{templateCode,jdbcType=VARCHAR},
+			</if>
+			<if test="templateName != null">
+				#{templateName,jdbcType=VARCHAR},
+			</if>
+			<if test="validateType != null">
+				#{validateType,jdbcType=INTEGER},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgTemplate">
+		update msg_template
+		<set>
+			<if test="templateCode != null">
+				TemplateCode = #{templateCode,jdbcType=VARCHAR},
+			</if>
+			<if test="templateName != null">
+				TemplateName = #{templateName,jdbcType=VARCHAR},
+			</if>
+			<if test="validateType != null">
+				ValidateType = #{validateType,jdbcType=INTEGER},
+			</if>
+			<if test="isValid != null">
+				IsValid = #{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgTemplate">
+		update
+		msg_template
+		set TemplateCode = #{templateCode,jdbcType=VARCHAR},
+		TemplateName = #{templateName,jdbcType=VARCHAR},
+		ValidateType =
+		#{validateType,jdbcType=INTEGER},
+		IsValid = #{isValid,jdbcType=BIT},
+		CreateTime = #{createTime,jdbcType=TIMESTAMP},
+		UpdateTime =
+		#{updateTime,jdbcType=TIMESTAMP}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+</mapper>

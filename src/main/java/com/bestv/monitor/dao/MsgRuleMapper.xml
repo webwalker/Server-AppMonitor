@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgRuleMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgRule">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="RuleName" property="ruleName" jdbcType="VARCHAR" />
+		<result column="RuleRegex" property="ruleRegex" jdbcType="VARCHAR" />
+		<result column="Message" property="message" jdbcType="VARCHAR" />
+		<result column="IsValid" property="isValid" jdbcType="BIT" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, RuleName, RuleRegex, Message, IsValid, CreateTime,
+		UpdateTime
+	</sql>
+	<select id="selectAll" resultMap="BaseResultMap">
+		SELECT * from msg_rule
+	</select>
+	<select id="selectAllWithTemplate" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		SELECT mr.*, mtr.TempID
+		from msg_rule mr left JOIN
+		(select * from msg_temp_rule where TempID = #{ID,jdbcType=INTEGER})
+		mtr
+		on mr.ID = mtr.RuleID
+		order by mr.id
+	</select>
+	<insert id="bindIDs" parameterType="java.util.List">
+		insert into msg_temp_rule
+		(TempID, RuleID)
+		values
+		<foreach item="item" collection="list" index="index"
+			separator=",">
+			(#{item.ID,jdbcType=VARCHAR},
+			#{item.ruleID,jdbcType=INTEGER})
+		</foreach>
+	</insert>
+	<delete id="unbindIDs" parameterType="java.util.Map">
+		DELETE FROM msg_temp_rule where TempID =
+		#{tempID,jdbcType=VARCHAR}
+		and
+		RuleID in
+		<foreach item="id" collection="rules" open="(" separator=","
+			close=")">
+			#{id,mode=IN,jdbcType=VARCHAR}
+		</foreach>
+	</delete>
+	<delete id="deleteByIDs" parameterType="java.lang.String">
+		DELETE FROM msg_rule where id in
+		<foreach item="rid" collection="array" open="(" separator=","
+			close=")">
+			#{rid,mode=IN,jdbcType=INTEGER}
+		</foreach>
+	</delete>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from msg_rule
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		msg_rule
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgRule">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_rule (RuleName, RuleRegex, Message,
+		IsValid,
+		CreateTime, UpdateTime
+		)
+		values (#{ruleName,jdbcType=VARCHAR},
+		#{ruleRegex,jdbcType=VARCHAR},
+		#{message,jdbcType=VARCHAR},
+		#{isValid,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgRule">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_rule
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="ruleName != null">
+				RuleName,
+			</if>
+			<if test="ruleRegex != null">
+				RuleRegex,
+			</if>
+			<if test="message != null">
+				Message,
+			</if>
+			<if test="isValid != null">
+				IsValid,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="updateTime != null">
+				UpdateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="ruleName != null">
+				#{ruleName,jdbcType=VARCHAR},
+			</if>
+			<if test="ruleRegex != null">
+				#{ruleRegex,jdbcType=VARCHAR},
+			</if>
+			<if test="message != null">
+				#{message,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgRule">
+		update msg_rule
+		<set>
+			<if test="ruleName != null">
+				RuleName = #{ruleName,jdbcType=VARCHAR},
+			</if>
+			<if test="ruleRegex != null">
+				RuleRegex = #{ruleRegex,jdbcType=VARCHAR},
+			</if>
+			<if test="message != null">
+				Message = #{message,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				IsValid = #{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgRule">
+		update msg_rule
+		set RuleName = #{ruleName,jdbcType=VARCHAR},
+		RuleRegex =
+		#{ruleRegex,jdbcType=VARCHAR},
+		Message = #{message,jdbcType=VARCHAR},
+		IsValid = #{isValid,jdbcType=BIT},
+		CreateTime =
+		#{createTime,jdbcType=TIMESTAMP},
+		UpdateTime =
+		#{updateTime,jdbcType=TIMESTAMP}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+</mapper>

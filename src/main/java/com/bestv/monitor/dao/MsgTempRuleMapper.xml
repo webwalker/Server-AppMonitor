@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgTempRuleMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgTempRule">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="TempCode" property="tempCode" jdbcType="VARCHAR" />
+		<result column="RuleID" property="ruleID" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, TempCode, RuleID, CreateTime, UpdateTime
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from msg_temp_rule
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from msg_temp_rule
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgTempRule">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_temp_rule (TempCode, RuleID, CreateTime,
+		UpdateTime)
+		values (#{tempCode,jdbcType=VARCHAR}, #{ruleID,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgTempRule">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_temp_rule
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="tempCode != null">
+				TempCode,
+			</if>
+			<if test="ruleID != null">
+				RuleID,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="updateTime != null">
+				UpdateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="tempCode != null">
+				#{tempCode,jdbcType=VARCHAR},
+			</if>
+			<if test="ruleID != null">
+				#{ruleID,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgTempRule">
+		update msg_temp_rule
+		<set>
+			<if test="tempCode != null">
+				TempCode = #{tempCode,jdbcType=VARCHAR},
+			</if>
+			<if test="ruleID != null">
+				RuleID = #{ruleID,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgTempRule">
+		update msg_temp_rule
+		set TempCode = #{tempCode,jdbcType=VARCHAR},
+		RuleID = #{ruleID,jdbcType=INTEGER},
+		CreateTime = #{createTime,jdbcType=TIMESTAMP},
+		UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+</mapper>

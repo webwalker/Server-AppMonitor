@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgConfigMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgConfig">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="ConfigKey" property="configKey" jdbcType="VARCHAR" />
+		<result column="ConfigValue" property="configValue" jdbcType="VARCHAR" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="IsValid" property="isValid" jdbcType="BIT" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<resultMap id="MsgConfigJsonResultMap" type="com.bestv.monitor.model.MsgConfigJson">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="ConfigKey" property="configKey" jdbcType="VARCHAR" />
+		<result column="ConfigValue" property="configValue" jdbcType="VARCHAR" />
+		<result column="Remark" property="remark" jdbcType="VARCHAR" />
+		<result column="IsValid" property="isValid" jdbcType="BIT" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, ConfigKey, ConfigValue,ConfigType, Remark, IsValid,
+		CreateTime,UpdateTime
+	</sql>
+	<select id="selectAll" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from msg_config
+	</select>
+	<select id="selectValids" resultMap="MsgConfigJsonResultMap">
+		select ConfigKey,
+		ConfigValue,ConfigType, Remark from msg_config
+		where IsValid = 1
+	</select>
+	<delete id="deleteByIDs" parameterType="java.lang.String">
+		DELETE FROM msg_config where id in
+		<foreach item="cid" collection="array" open="(" separator=","
+			close=")">
+			#{cid,mode=IN,jdbcType=INTEGER}
+		</foreach>
+	</delete>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from msg_config
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		msg_config
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgConfig">
+		insert into msg_config
+		(ConfigKey, ConfigValue, ConfigType,
+		Remark, IsValid, CreateTime,
+		UpdateTime)
+		values (#{configKey,jdbcType=VARCHAR},
+		#{configValue,jdbcType=VARCHAR},
+		#{configType,jdbcType=INTEGER},
+		#{remark,jdbcType=VARCHAR}, #{isValid,jdbcType=BIT},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgConfig">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_config
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="configKey != null">
+				ConfigKey,
+			</if>
+			<if test="configValue != null">
+				ConfigValue,
+			</if>
+			<if test="configType != null">
+				ConfigType,
+			</if>
+			<if test="remark != null">
+				Remark,
+			</if>
+			<if test="isValid != null">
+				IsValid,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="updateTime != null">
+				UpdateTime,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="configKey != null">
+				#{configKey,jdbcType=VARCHAR},
+			</if>
+			<if test="configValue != null">
+				#{configValue,jdbcType=VARCHAR},
+			</if>
+			<if test="configType != null">
+				#{configType,jdbcType=INTEGER},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgConfig">
+		update msg_config
+		<set>
+			<if test="configKey != null">
+				ConfigKey = #{configKey,jdbcType=VARCHAR},
+			</if>
+			<if test="configValue != null">
+				ConfigValue = #{configValue,jdbcType=VARCHAR},
+			</if>
+			<if test="configType != null">
+				ConfigType = #{configType,jdbcType=INTEGER},
+			</if>
+			<if test="remark != null">
+				Remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				IsValid = #{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgConfig">
+		update msg_config
+		set ConfigKey = #{configKey,jdbcType=VARCHAR},
+		ConfigValue =
+		#{configValue,jdbcType=VARCHAR},
+		ConfigType =
+		#{configType,jdbcType=INTEGER},
+		Remark = #{remark,jdbcType=VARCHAR},
+		IsValid = #{isValid,jdbcType=BIT},
+		CreateTime =
+		#{createTime,jdbcType=TIMESTAMP},
+		UpdateTime =
+		#{updateTime,jdbcType=TIMESTAMP}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgLogExtMapper" >
+  <resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgLogExt" >
+    <id column="ID" property="ID" jdbcType="INTEGER" />
+    <result column="MsgID" property="msgID" jdbcType="INTEGER" />
+    <result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.bestv.monitor.model.MsgLogExt" extends="BaseResultMap" >
+    <result column="MsgBody" property="msgBody" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, MsgID, CreateTime
+  </sql>
+  <sql id="Blob_Column_List" >
+    MsgBody
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from msg_log_ext
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from msg_log_ext
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.bestv.monitor.model.MsgLogExt" >
+    <selectKey resultType="java.lang.Integer" keyProperty="ID" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into msg_log_ext (MsgID, CreateTime, MsgBody
+      )
+    values (#{msgID,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{msgBody,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgLogExt" >
+    <selectKey resultType="java.lang.Integer" keyProperty="ID" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into msg_log_ext
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="msgID != null" >
+        MsgID,
+      </if>
+      <if test="createTime != null" >
+        CreateTime,
+      </if>
+      <if test="msgBody != null" >
+        MsgBody,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="msgID != null" >
+        #{msgID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="msgBody != null" >
+        #{msgBody,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgLogExt" >
+    update msg_log_ext
+    <set >
+      <if test="msgID != null" >
+        MsgID = #{msgID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="msgBody != null" >
+        MsgBody = #{msgBody,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bestv.monitor.model.MsgLogExt" >
+    update msg_log_ext
+    set MsgID = #{msgID,jdbcType=INTEGER},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      MsgBody = #{msgBody,jdbcType=LONGVARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgLogExt" >
+    update msg_log_ext
+    set MsgID = #{msgID,jdbcType=INTEGER},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

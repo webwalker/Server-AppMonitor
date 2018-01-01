@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bestv.monitor.dao.MsgLogMapper">
+	<resultMap id="BaseResultMap" type="com.bestv.monitor.model.MsgLog">
+		<id column="ID" property="ID" jdbcType="INTEGER" />
+		<result column="UserID" property="userID" jdbcType="VARCHAR" />
+		<result column="UserGroup" property="userGroup" jdbcType="VARCHAR" />
+		<result column="Area" property="area" jdbcType="VARCHAR" />
+		<result column="OsVersion" property="osVersion" jdbcType="VARCHAR" />
+		<result column="ApkVersion" property="apkVersion" jdbcType="VARCHAR" />
+		<result column="ModuleUrl" property="moduleUrl" jdbcType="VARCHAR" />
+		<result column="PayAgentUrl" property="payAgentUrl" jdbcType="VARCHAR" />
+		<result column="AppCode" property="appCode" jdbcType="VARCHAR" />
+		<result column="Type" property="type" jdbcType="INTEGER" />
+		<result column="MsgType" property="msgType" jdbcType="INTEGER" />
+		<result column="Label" property="label" jdbcType="VARCHAR" />
+		<result column="TempCode" property="tempCode" jdbcType="VARCHAR" />
+		<result column="Ext" property="ext" jdbcType="VARCHAR" />
+		<result column="Message" property="message" jdbcType="VARCHAR" />
+		<result column="IsValid" property="isValid" jdbcType="BIT" />
+		<result column="CreateIndex" property="createIndex" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="LogCount" property="logCount" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="ResultMapWithBLOBs" type="com.bestv.monitor.model.MsgLog"
+		extends="BaseResultMap">
+		<result column="Data" property="data" jdbcType="LONGVARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		ID, UserID, UserGroup, Area, OsVersion, ApkVersion,
+		ModuleUrl, PayAgentUrl, AppCode, Type, Label, TempCode,Ext, IsValid,
+		CreateIndex, CreateTime, Message
+	</sql>
+	<sql id="Blob_Column_List">
+		Data
+	</sql>
+	<select id="selectLogsCount" resultMap="ResultMapWithBLOBs"
+		parameterType="java.util.Map">
+		SELECT count(ID) as logCount
+		FROM msg_log
+		WHERE 1=1
+		<include refid="queryLogSal" />
+	</select>
+	<sql id="queryLogSal">
+		<if test="log.userID != null and log.userID != ''">
+			and UserID = #{log.userID,jdbcType=VARCHAR}
+		</if>
+		<if test="log.userGroup != null and log.userGroup != ''">
+			and UserGroup = #{log.userGroup,jdbcType=VARCHAR}
+		</if>
+		<if test="log.area != null and log.area != ''">
+			and Area = #{log.area,jdbcType=VARCHAR}
+		</if>
+		<if test="log.appCode != null and log.appCode != ''">
+			and AppCode = #{log.appCode,jdbcType=VARCHAR}
+		</if>
+		<if test="log.type != null and log.type != 0">
+			and Type = #{log.type,jdbcType=INTEGER}
+		</if>
+		<if test="log.label != null and log.label != ''">
+			and Label = #{log.label,jdbcType=VARCHAR}
+		</if>
+		<if test="log.isValid != null">
+			and IsValid = #{log.isValid,jdbcType=BIT}
+		</if>
+	</sql>
+	<select id="selectLogs" resultMap="ResultMapWithBLOBs"
+		parameterType="java.util.Map">
+		SELECT ml.*, mt.MsgName as MsgType
+		FROM msg_log ml left join msg_type
+		mt on ml.type = mt.id
+		WHERE 1=1
+		<include refid="queryLogSal" />
+		and ml.ID >= ( SELECT ID FROM msg_log
+		ORDER BY ID LIMIT
+		#{rows,jdbcType=INTEGER}, 1
+		) LIMIT 0,#{pageSize,jdbcType=INTEGER}
+	</select>
+	<select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from msg_log
+		where ID = #{ID,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		msg_log
+		where ID = #{ID,jdbcType=INTEGER}
+	</delete>
+	<delete id="deleteBeforeDate" parameterType="java.lang.String">
+		<![CDATA[delete from msg_log
+		where CreateTime < #{date,jdbcType=VARCHAR} ]]>
+	</delete>
+	<insert id="insert" parameterType="com.bestv.monitor.model.MsgLog">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_log (UserID, UserGroup, Area,
+		OsVersion, ApkVersion,
+		ModuleUrl,
+		PayAgentUrl, AppCode, Type,
+		Label, Ext, IsValid, CreateIndex,
+		CreateTime,
+		Data, Message, TempCode)
+		values (#{userID,jdbcType=VARCHAR},
+		#{userGroup,jdbcType=VARCHAR},
+		#{area,jdbcType=VARCHAR},
+		#{osVersion,jdbcType=VARCHAR}, #{apkVersion,jdbcType=VARCHAR},
+		#{moduleUrl,jdbcType=VARCHAR},
+		#{payAgentUrl,jdbcType=VARCHAR},
+		#{appCode,jdbcType=VARCHAR},
+		#{type,jdbcType=INTEGER},
+		#{label,jdbcType=VARCHAR}, #{ext,jdbcType=VARCHAR},
+		#{isValid,jdbcType=BIT},
+		#{createIndex,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{data,jdbcType=LONGVARCHAR},
+		#{message,jdbcType=VARCHAR},
+		#{tempCode,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.bestv.monitor.model.MsgLog">
+		<selectKey resultType="java.lang.Integer" keyProperty="ID"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into msg_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userID != null">
+				UserID,
+			</if>
+			<if test="userGroup != null">
+				UserGroup,
+			</if>
+			<if test="area != null">
+				Area,
+			</if>
+			<if test="osVersion != null">
+				OsVersion,
+			</if>
+			<if test="apkVersion != null">
+				ApkVersion,
+			</if>
+			<if test="moduleUrl != null">
+				ModuleUrl,
+			</if>
+			<if test="payAgentUrl != null">
+				PayAgentUrl,
+			</if>
+			<if test="appCode != null">
+				AppCode,
+			</if>
+			<if test="type != null">
+				Type,
+			</if>
+			<if test="label != null">
+				Label,
+			</if>
+			<if test="ext != null">
+				Ext,
+			</if>
+			<if test="isValid != null">
+				IsValid,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="data != null">
+				Data,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userID != null">
+				#{userID,jdbcType=VARCHAR},
+			</if>
+			<if test="userGroup != null">
+				#{userGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="area != null">
+				#{area,jdbcType=VARCHAR},
+			</if>
+			<if test="osVersion != null">
+				#{osVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="apkVersion != null">
+				#{apkVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="moduleUrl != null">
+				#{moduleUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="payAgentUrl != null">
+				#{payAgentUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="appCode != null">
+				#{appCode,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=INTEGER},
+			</if>
+			<if test="label != null">
+				#{label,jdbcType=VARCHAR},
+			</if>
+			<if test="ext != null">
+				#{ext,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="data != null">
+				#{data,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.bestv.monitor.model.MsgLog">
+		update msg_log
+		<set>
+			<if test="userID != null">
+				UserID = #{userID,jdbcType=VARCHAR},
+			</if>
+			<if test="userGroup != null">
+				UserGroup = #{userGroup,jdbcType=VARCHAR},
+			</if>
+			<if test="area != null">
+				Area = #{area,jdbcType=VARCHAR},
+			</if>
+			<if test="osVersion != null">
+				OsVersion = #{osVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="apkVersion != null">
+				ApkVersion = #{apkVersion,jdbcType=VARCHAR},
+			</if>
+			<if test="moduleUrl != null">
+				ModuleUrl = #{moduleUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="payAgentUrl != null">
+				PayAgentUrl = #{payAgentUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="appCode != null">
+				AppCode = #{appCode,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				Type = #{type,jdbcType=INTEGER},
+			</if>
+			<if test="label != null">
+				Label = #{label,jdbcType=VARCHAR},
+			</if>
+			<if test="ext != null">
+				Ext = #{ext,jdbcType=VARCHAR},
+			</if>
+			<if test="isValid != null">
+				IsValid = #{isValid,jdbcType=BIT},
+			</if>
+			<if test="createTime != null">
+				CreateTime = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="data != null">
+				Data = #{data,jdbcType=LONGVARCHAR},
+			</if>
+		</set>
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.bestv.monitor.model.MsgLog">
+		update
+		msg_log
+		set UserID = #{userID,jdbcType=VARCHAR},
+		UserGroup =
+		#{userGroup,jdbcType=VARCHAR},
+		Area = #{area,jdbcType=VARCHAR},
+		OsVersion = #{osVersion,jdbcType=VARCHAR},
+		ApkVersion =
+		#{apkVersion,jdbcType=VARCHAR},
+		ModuleUrl =
+		#{moduleUrl,jdbcType=VARCHAR},
+		PayAgentUrl =
+		#{payAgentUrl,jdbcType=VARCHAR},
+		AppCode = #{appCode,jdbcType=VARCHAR},
+		Type = #{type,jdbcType=INTEGER},
+		Label = #{label,jdbcType=VARCHAR},
+		Ext
+		= #{ext,jdbcType=VARCHAR},
+		IsValid = #{isValid,jdbcType=BIT},
+		CreateTime = #{createTime,jdbcType=TIMESTAMP},
+		Data =
+		#{data,jdbcType=LONGVARCHAR}
+		where ID = #{ID,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.bestv.monitor.model.MsgLog">
+		update msg_log
+		set
+		UserID = #{userID,jdbcType=VARCHAR},
+		UserGroup =
+		#{userGroup,jdbcType=VARCHAR},
+		Area = #{area,jdbcType=VARCHAR},
+		OsVersion = #{osVersion,jdbcType=VARCHAR},
+		ApkVersion =
+		#{apkVersion,jdbcType=VARCHAR},
+		ModuleUrl =
+		#{moduleUrl,jdbcType=VARCHAR},
+		PayAgentUrl =
+		#{payAgentUrl,jdbcType=VARCHAR},
+		AppCode = #{appCode,jdbcType=VARCHAR},
+		Type = #{type,jdbcType=INTEGER},
+		Label = #{label,jdbcType=VARCHAR},
+		Ext
+		= #{ext,jdbcType=VARCHAR},
+		IsValid = #{isValid,jdbcType=BIT},
+		CreateTime = #{createTime,jdbcType=TIMESTAMP}
+		where ID =
+		#{ID,jdbcType=INTEGER}
+	</update>
+</mapper>
